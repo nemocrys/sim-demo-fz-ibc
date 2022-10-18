@@ -35,7 +35,7 @@ hole2 = occ.add_cone(0, 0.001, 0, 0, 0.007, 0, 0.008, 0.04)
 occ.cut([(3, coil)], [(3, slit), (3, hole1), (3, hole2)])
 
 inductor = Shape(model, 3, "inductor", [coil_body])
-inductor.mesh_size = 0.002
+inductor.mesh_size = 0.0025
 
 air = occ.add_cylinder(0, -0.2, 0, 0, 0.4, 0, 0.2)
 air = Shape(model, 3, "air", [air])
