@@ -1,0 +1,65 @@
+# Simulation
+3D_steady:
+  Max Output Level: 4
+  Coordinate System: Cartesian
+  Simulation Type: Steady
+  Steady State Max Iterations: 10
+
+# Solvers
+MGDynamics:
+  Equation: MGDynamics
+  Variable: AV[AV re:1 AV im:1]
+  Procedure: '"MagnetoDynamics" "WhitneyAVHarmonicSolver"'
+  Linear System Solver: Iterative
+  Linear System Preconditioning: none
+  Linear System Residual Output: 20
+  Linear System Max Iterations: 10000
+  Linear System Iterative Method: BiCGStabl
+  Linear System Convergence Tolerance: 1e-06
+  Linear System Robust: True
+  Linear System Abort Not Converged: False
+  BicgStabl Polynomial Degree: 4
+MGDynamicsCalc:
+  Equation: MGDynamicsCalc
+  Procedure: '"MagnetoDynamics" "MagnetoDynamicsCalcFields"'
+  Potential Variable: 'String "AV"'
+  Calculate Current Density: Logical True
+  Calculate Electric Field: Logical True
+  Calculate Magnetic Field Strength: Logical True
+  Calculate Joule Heating: True
+  Calculate Nodal Heating: True
+  Steady State Convergence Tolerance: 1e-06
+  Calculate Nodal Fields: False
+  Calculate Elemental Fields: True
+  Linear System Solver: Iterative
+  Linear System Preconditioning: ILU0
+  Linear System Residual Output: 0
+  Linear System Max Iterations: 5000
+  Linear System Iterative Method: CG
+  Linear System Convergence Tolerance: 1e-08
+ResultOutputSolver:
+  Exec Solver: after saving
+  Equation: "ResultOutput"
+  Procedure: '"ResultOutputSolve" "ResultOutputSolver"'
+  Vtu Format: True
+  Vtu Part collection: True
+  Save Bulk Only: True
+  Output Directory: results
+  Output File name: case
+
+# Materials
+copper-inductor:
+  Density: 8960.0  # 0°C
+  Electric Conductivity: 0 # 58.1e+6  # 20°C
+  Emissivity: 0.2  # 327°C
+  Heat Capacity: 384.4  # interpolated for 20°C
+  Heat Conductivity: 390.0  # estimated using data sheets
+  Relative Permeability: 1
+  Relative Permittivity: 1
+air:
+  Density: 1.1885  # 20°C
+  Electric Conductivity: 0.0 
+  Heat Capacity: 1006.4  # 20°C
+  Heat Conductivity: 25.873e-3  # 20°C
+  Relative Permeability: 1
+  Relative Permittivity: 1
