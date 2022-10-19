@@ -48,7 +48,7 @@ ResultOutputSolver:
   Output File name: case
 
 # Materials
-copper-inductor:
+copper-ibc:
   Density: 8960.0  # 0°C
   Electric Conductivity: 0 # 58.1e+6  # 20°C
   Emissivity: 0.2  # 327°C
@@ -61,5 +61,13 @@ air:
   Electric Conductivity: 0.0 
   Heat Capacity: 1006.4  # 20°C
   Heat Conductivity: 25.873e-3  # 20°C
+  Relative Permeability: 1
+  Relative Permittivity: 1
+tin-ibc:
+  Density: 7179.0
+  Electric Conductivity: 0.0  # 4.38e+6
+  Emissivity: 0.064
+  Heat Capacity: 244.0
+  Heat Conductivity: 60.0
   Relative Permeability: 1
   Relative Permittivity: 1
