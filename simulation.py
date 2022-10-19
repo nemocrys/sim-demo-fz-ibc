@@ -15,7 +15,7 @@ occ = gmsh.model.occ
 sim_dir = "./simdata"
 current = 100  # A
 frequency = 1e6  # Hz
-mesh_size_factor = 2  # increase for coarser, decrease for finer mesh
+mesh_size_factor = 1  # increase for coarser, decrease for finer mesh
 visualize = False  # must be false in docker container
 
 if not os.path.exists(sim_dir):
