@@ -13,8 +13,8 @@ occ = gmsh.model.occ
 ####################
 # parameters
 sim_dir = "./simdata"
-current = 100  # A
-frequency = 1e6  # Hz
+current = 148  # A
+frequency = 0.644e6  # Hz
 mesh_size_factor = 1  # increase for coarser, decrease for finer mesh
 visualize = False  # must be false in docker container
 
@@ -24,20 +24,20 @@ if not os.path.exists(sim_dir):
 # geometry modeling
 model = Model()
 
-coil_body = occ.add_cylinder(0, 0, 0, 0, 0.008, 0, 0.1)
+coil_body = occ.add_cylinder(0, 0, 0, 0, 0.008, 0, 0.0465)
 supply_1 = occ.add_cylinder(0.004 + 0.001, 0.004, 0, 0, 0, 0.2, 0.004)
 supply_2 = occ.add_cylinder(-0.004 - 0.001, 0.004, 0, 0, 0, 0.2, 0.004)
 coil = occ.fuse([(3, coil_body)], [(3, supply_1), (3, supply_2)])[0][0][1]
 
 slit = occ.add_box(-0.001, 0, 0, 0.002, 1, 1)
 hole1 = occ.add_cylinder(0, 0, 0, 0, 0.008, 0, 0.004)
-hole2 = occ.add_cone(0, 0.001, 0, 0, 0.007, 0, 0.004, 0.04)
+hole2 = occ.add_cone(0, 0.00, 0, 0, 0.008, 0, 0.00226666, 0.03)
 occ.cut([(3, coil)], [(3, slit), (3, hole1), (3, hole2)])
 
 inductor = Shape(model, 3, "inductor", [coil_body])
 inductor.mesh_size = 0.0025
 
-feed = occ.add_cylinder(0, 0.005, 0, 0, 0.15, 0, 0.005)
+feed = occ.add_cylinder(0, 0.001, 0, 0, 0.15, 0, 0.00404)
 feed = Shape(model, 3, "feed", [feed])
 feed.mesh_size = 0.0025
 
@@ -60,6 +60,8 @@ bnd_air = Shape(model, 2, "bnd_air", [x for x in air.boundaries if x not in air.
 inductor_ends = [x for x in inductor.boundaries if x not in inductor.get_interface(air)]
 bnd_supply_1 = Shape(model, 2, "bnd_supply_1", [inductor_ends[0]])
 bnd_supply_2 = Shape(model, 2, "bnd_supply_2", [inductor_ends[1]])
+
+model.show()
 
 model.make_physical()
 
