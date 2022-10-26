@@ -85,9 +85,10 @@ solver_mgdyn = elmer.load_solver("MGDynamics", sim, "./config_elmer.yml")
 solver_mgdyn.data.update({"Angular Frequency": 2*np.pi*frequency})
 solver_calc = elmer.load_solver("MGDynamicsCalc", sim, "./config_elmer.yml")
 solver_mgdyn.data.update({"Angular Frequency": 2*np.pi*frequency})
+solver_heat = elmer.load_solver("HeatSolver", sim, "./config_elmer.yml")
 solver_output = elmer.load_solver("ResultOutputSolver", sim, "./config_elmer.yml")
 
-eqn_main = elmer.Equation(sim, "eqn_main", [solver_mgdyn, solver_calc], {"name": "eqn_main"})
+eqn_main = elmer.Equation(sim, "eqn_main", [solver_mgdyn, solver_calc, solver_heat], {"name": "eqn_main"})
 
 mat_copper = elmer.load_material("copper-ibc", sim, "./config_elmer.yml")
 mat_copper.data.update({"name": "copper-ibc"})
@@ -106,10 +107,18 @@ feed = elmer.Body(sim, "feed", [feed.ph_id], {"name": "feed"})
 feed.material = mat_tin
 feed.equation = eqn_main
 
+joule_heat = elmer.BodyForce(sim, "joule_heat")
+joule_heat.data = {
+    "Temperature Load": 'Equals "Nodal Joule Heating"'
+}
+feed.body_force = joule_heat
+inductor.body_force = joule_heat
+
 bnd_air = elmer.Boundary(sim, "bnd_air", [bnd_air.ph_id], {"name": "bnd_air"})
 bnd_air.data.update({
     "AV re {e}": "Real 0.0",
     "AV im {e}": "Real 0.0",
+    "Temperature": 293.15,
 })
 bnd_supply_1 = elmer.Boundary(sim, "bnd_supply_1", [bnd_supply_1.ph_id], {"name": "bnd_supply_1"})
 bnd_supply_1.data.update({
