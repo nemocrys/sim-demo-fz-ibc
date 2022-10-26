@@ -15,6 +15,7 @@ occ = gmsh.model.occ
 sim_dir = "./simdata"
 current = 148  # A
 frequency = 0.644e6  # Hz
+heat_transfer_coefficient = 10  # W/(m^2 K)
 mesh_size_factor = 1  # increase for coarser, decrease for finer mesh
 visualize = False  # must be false in docker container
 
@@ -136,11 +137,15 @@ surf_inductor = elmer.Boundary(sim, "surf_inductor", [surf_inductor.ph_id], {"na
 surf_inductor.data.update({
     "Layer Electric Conductivity": "Real 58.1e+6",  # TODO load that from config
     "Layer Relative Permeability": "Real 1",
+    "Temperature": 293.15,
 })
 surf_feed = elmer.Boundary(sim, "surf_feed", [surf_feed.ph_id], {"name": "surf_feed"})
 surf_feed.data.update({
     "Layer Electric Conductivity": "Real 4.38e+6",  # TODO load that from config
     "Layer Relative Permeability": "Real 1",
+    "Heat transfer coefficient": heat_transfer_coefficient,
+    "External Temperature": 293.15,
+    "Radiation": "Idealized"
 })
 
 bnd_current_supply = elmer.Boundary(sim, "bnd_current_supply", data={"name": "bnd_current_supply"})
