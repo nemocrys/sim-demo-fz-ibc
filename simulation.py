@@ -61,8 +61,6 @@ inductor_ends = [x for x in inductor.boundaries if x not in inductor.get_interfa
 bnd_supply_1 = Shape(model, 2, "bnd_supply_1", [inductor_ends[0]])
 bnd_supply_2 = Shape(model, 2, "bnd_supply_2", [inductor_ends[1]])
 
-model.show()
-
 model.make_physical()
 
 model.deactivate_characteristic_length()
