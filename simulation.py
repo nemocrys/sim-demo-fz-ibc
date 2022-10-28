@@ -9,7 +9,6 @@ from pyelmer.post import scan_logfile
 occ = gmsh.model.occ
 
 
-
 ####################
 # parameters
 sim_dir = "./simdata"
@@ -18,6 +17,8 @@ frequency = 0.644e6  # Hz
 heat_transfer_coefficient = 10  # W/(m^2 K)
 mesh_size_factor = 1  # increase for coarser, decrease for finer mesh
 visualize = False  # must be false in docker container
+
+feed_shift = 2.e-3 # moves feed to the top, if positive
 
 if not os.path.exists(sim_dir):
     os.makedirs(sim_dir)
@@ -38,7 +39,7 @@ occ.cut([(3, coil)], [(3, slit), (3, hole1), (3, hole2)])
 inductor = Shape(model, 3, "inductor", [coil_body])
 inductor.mesh_size = 0.0025
 
-feed = occ.add_cylinder(0, 0.001, 0, 0, 0.15, 0, 0.00404)
+feed = occ.add_cylinder(0, 0.001 + feed_shift, 0, 0, 0.15, 0, 0.00404)
 feed = Shape(model, 3, "feed", [feed])
 feed.mesh_size = 0.0025
 
@@ -62,12 +63,18 @@ inductor_ends = [x for x in inductor.boundaries if x not in inductor.get_interfa
 bnd_supply_1 = Shape(model, 2, "bnd_supply_1", [inductor_ends[0]])
 bnd_supply_2 = Shape(model, 2, "bnd_supply_2", [inductor_ends[1]])
 
+inductor_inner_ring = Shape(model, 2, "inductor_inner_ring", [34])  # helper boundary for mesh refinement, extracted manually
+feed_bot = Shape(model, 2, "feed_bot", [21])  # helper boundary for mesh refinement, extracted manually
+
 model.make_physical()
+
 
 model.deactivate_characteristic_length()
 model.set_const_mesh_sizes()
 MeshControlExponential(model, inductor, inductor.mesh_size, exp=1.6, fact=2)
 MeshControlExponential(model, feed, feed.mesh_size, exp=1.6, fact=2)
+MeshControlExponential(model, inductor_inner_ring, inductor.mesh_size/5, exp=1.6, fact=2)
+MeshControlExponential(model, feed_bot, feed.mesh_size/5, exp=1.6, fact=2)
 
 model.generate_mesh(3, optimize="Netgen", size_factor=mesh_size_factor)
 if visualize:
