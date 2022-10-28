@@ -18,7 +18,7 @@ heat_transfer_coefficient = 10  # W/(m^2 K)
 mesh_size_factor = 1  # increase for coarser, decrease for finer mesh
 visualize = False  # must be false in docker container
 
-feed_shift = 2.e-3 # moves feed to the top, if positive
+feed_shift = 1.e-3 # moves feed to the top, if positive
 
 if not os.path.exists(sim_dir):
     os.makedirs(sim_dir)
@@ -73,8 +73,8 @@ model.deactivate_characteristic_length()
 model.set_const_mesh_sizes()
 MeshControlExponential(model, inductor, inductor.mesh_size, exp=1.6, fact=2)
 MeshControlExponential(model, feed, feed.mesh_size, exp=1.6, fact=2)
-MeshControlExponential(model, inductor_inner_ring, inductor.mesh_size/5, exp=1.6, fact=2)
-MeshControlExponential(model, feed_bot, feed.mesh_size/5, exp=1.6, fact=2)
+MeshControlExponential(model, inductor_inner_ring, inductor.mesh_size/10, exp=1.6, fact=2)
+MeshControlExponential(model, feed_bot, feed.mesh_size/10, exp=1.6, fact=2)
 
 model.generate_mesh(3, optimize="Netgen", size_factor=mesh_size_factor)
 if visualize:
