@@ -3,6 +3,7 @@ import gmsh
 import os
 import numpy as np
 import pyelmer.elmer as elmer
+import yaml
 from pyelmer.execute import run_elmer_grid, run_elmer_solver
 from pyelmer.post import scan_logfile
 
@@ -13,21 +14,34 @@ occ = gmsh.model.occ
 ####################
 # parameters
 sim_dir = "./simdata"
-current = 92*np.sqrt(2)  # A
-frequency = 0.665e6  # Hz
+current = 2.154/20*1000*np.sqrt(2)  # = 152 A; from 2.154V (108 A) Rogowski signal
+frequency = 634000  # Hz
 mesh_size_factor = 0.75  # increase for coarser, decrease for finer mesh
 visualize = False  # must be false in docker container
 
 if not os.path.exists(sim_dir):
     os.makedirs(sim_dir)
+
+# with open("config_geo.yml", "r") as stream:
+#     try:
+#         print(yaml.safe_load(stream))
+#     except yaml.YAMLError as exc:
+#         print(exc)
 ####################
+
+
 # geometry modeling
 model = Model()
 
-coil_body = occ.add_cylinder(0, 0, 0, 0, 0.008, 0, 0.0465)
+coil_body = occ.add_cylinder(0, 0, 0, 0, 0.008, 0, 0.04)
 supply_1 = occ.add_cylinder(0.004 + 0.001, 0.004, 0, 0, 0, 0.2, 0.004)
 supply_2 = occ.add_cylinder(-0.004 - 0.001, 0.004, 0, 0, 0, 0.2, 0.004)
-coil = occ.fuse([(3, coil_body)], [(3, supply_1), (3, supply_2)])[0][0][1]
+# addTorus(x, y, z, r1, r2, tag=-1, angle=2*pi, zAxis=[]):
+coil_torus = occ.add_torus(0, 0.004, 0, 0.04, 0.004, zAxis = [0, 1, 0])
+# model.synchronize()
+# model.show()
+
+coil = occ.fuse([(3, coil_body)], [(3, supply_1), (3, supply_2), (3, coil_torus)])[0][0][1]
 
 slit = occ.add_box(-0.001, 0, 0, 0.002, 1, 1)
 hole1 = occ.add_cylinder(0, 0, 0, 0, 0.008, 0, 0.004)
@@ -55,7 +69,7 @@ inductor_ends = [x for x in inductor.boundaries if x not in inductor.get_interfa
 bnd_supply_1 = Shape(model, 2, "bnd_supply_1", [inductor_ends[0]])
 bnd_supply_2 = Shape(model, 2, "bnd_supply_2", [inductor_ends[1]])
 
-# model.show()
+model.show()
 
 model.make_physical()
 

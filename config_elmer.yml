@@ -46,7 +46,7 @@ ResultOutputSolver:
   Save Bulk Only: True
   Output Directory: results
   Output File name: case
-
+  Discontinuous Bodies: True
 # Materials
 copper-ibc:
   Density: 8960.0  # 0°C
