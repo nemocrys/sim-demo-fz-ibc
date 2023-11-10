@@ -37,6 +37,29 @@ MGDynamicsCalc:
   Linear System Max Iterations: 5000
   Linear System Iterative Method: CG
   Linear System Convergence Tolerance: 1e-08
+HeatSolver: 
+  Equation: Heat Equation
+  Procedure: '"HeatSolve" "HeatSolver"'
+  Variable: "Temperature"
+  Variable Dofs: 1
+  Calculate Loads: True
+  Exec Solver: Always
+  Nonlinear System Convergence Tolerance: 1e-06
+  Nonlinear System Max Iterations: 1000
+  Nonlinear System Relaxation Factor: 0.7
+  Steady State Convergence Tolerance: 1e-05
+  Stabilize: True
+  Optimize Bandwidth: True
+  Linear System Solver: Iterative
+  Linear System Iterative Method: Idrs
+  Linear System Max Iterations: 100000
+  Linear System Preconditioning: ILU
+  Linear System Precondition Recompute: 1
+  Linear System Convergence Tolerance: 1e-08
+  Linear System Abort Not Converged: True
+  Linear System Residual Output: 1
+  Smart Heater Control After Tolerance: 0.01
+  Gebhardt Factors Solver Iterative: True
 ResultOutputSolver:
   Exec Solver: after saving
   Equation: "ResultOutput"

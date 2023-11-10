@@ -13,73 +13,116 @@ occ = gmsh.model.occ
 
 ####################
 # parameters
+
+with open("config_geo.yml") as f:
+        config_geo = yaml.safe_load(f)
+
 sim_dir = "./simdata"
+
 current = 2.154/20*1000*np.sqrt(2)  # = 152 A; from 2.154V (108 A) Rogowski signal
 frequency = 634000  # Hz
-mesh_size_factor = 0.75  # increase for coarser, decrease for finer mesh
+heat_transfer_coefficient = 10 # W/m^2/K
+
+mesh_size_factor = 1  # increase for coarser, decrease for finer mesh
 visualize = False  # must be false in docker container
 
 if not os.path.exists(sim_dir):
     os.makedirs(sim_dir)
 
-# with open("config_geo.yml", "r") as stream:
-#     try:
-#         print(yaml.safe_load(stream))
-#     except yaml.YAMLError as exc:
-#         print(exc)
 ####################
+# mesh sizes
+inductor_mesh_size = 0.01
+feed_mesh_size = 0.01
+air_mesh_size = 0.1
+
+inductor_mesh_exp = 1.8
+inductor_mesh_fact = 2
+
+feed_mesh_exp = 1.8
+feed_mesh_fact = 2
+
+####################
+r_inner = config_geo["fz_inductor"]["r_inner"]
+r_outer = config_geo["fz_inductor"]["r_outer"]
+r_outerCoil = config_geo["fz_inductor"]["r_outerCoil"]
+r_bevel = config_geo["fz_inductor"]["r_bevel"]
+h_inner = config_geo["fz_inductor"]["h_inner"]
+h_outer = config_geo["fz_inductor"]["h_outer"]
+l_supply = config_geo["fz_inductor"]["l_supply"]
+t_slit = config_geo["fz_inductor"]["t_slit"]
+r_coil = h_outer/2
+r_conus = np.polyfit(np.array([h_inner, h_outer]),np.array([r_inner, r_bevel]),1)[1]
+
+X0_feed = config_geo["fz_crystal"]["X0"]
+r_feed = config_geo["fz_crystal"]["r"]
+l_feed = config_geo["fz_crystal"]["l"]
+
+X0_air = config_geo["surrounding"]["X0"]
+r_air = config_geo["surrounding"]["r"]
+h_air = config_geo["surrounding"]["h"]
+
+####################
+
 
 
 # geometry modeling
 model = Model()
 
-coil_body = occ.add_cylinder(0, 0, 0, 0, 0.008, 0, 0.04)
-supply_1 = occ.add_cylinder(0.004 + 0.001, 0.004, 0, 0, 0, 0.2, 0.004)
-supply_2 = occ.add_cylinder(-0.004 - 0.001, 0.004, 0, 0, 0, 0.2, 0.004)
+coil_body = occ.add_cylinder(0, 0, 0, 0, h_outer, 0, r_outer)
+supply_1 = occ.add_cylinder(r_coil + t_slit/2, r_coil, 0, 0, 0, l_supply, r_coil)
+supply_2 = occ.add_cylinder(-r_coil - t_slit/2, r_coil, 0, 0, 0, l_supply, r_coil)
 # addTorus(x, y, z, r1, r2, tag=-1, angle=2*pi, zAxis=[]):
-coil_torus = occ.add_torus(0, 0.004, 0, 0.04, 0.004, zAxis = [0, 1, 0])
+coil_torus = occ.add_torus(0, r_coil, 0, r_outer, r_coil, zAxis = [0, 1, 0])
 # model.synchronize()
 # model.show()
 
 coil = occ.fuse([(3, coil_body)], [(3, supply_1), (3, supply_2), (3, coil_torus)])[0][0][1]
 
-slit = occ.add_box(-0.001, 0, 0, 0.002, 1, 1)
-hole1 = occ.add_cylinder(0, 0, 0, 0, 0.008, 0, 0.004)
-hole2 = occ.add_cone(0, 0.00, 0, 0, 0.008, 0, 0.00226666, 0.03)
+slit = occ.add_box(-t_slit/2, 0, 0, t_slit, 1, 1)
+hole1 = occ.add_cylinder(0, 0, 0, 0, h_outer, 0, r_inner)
+hole2 = occ.add_cone(0, 0.00, 0, 0, h_outer, 0, r_conus, r_bevel)
 occ.cut([(3, coil)], [(3, slit), (3, hole1), (3, hole2)])
 
 inductor = Shape(model, 3, "inductor", [coil_body])
-inductor.mesh_size = 0.0025
+inductor.mesh_size = inductor_mesh_size
 
-air = occ.add_cylinder(0, -0.2, 0, 0, 0.4, 0, 0.2)
+feed = occ.add_cylinder(X0_feed[0], X0_feed[1], 0, 0, l_feed, 0, r_feed)
+feed = Shape(model, 3, "feed", [feed])
+feed.mesh_size = feed_mesh_size
+
+air = occ.add_cylinder(X0_air[0], X0_air[1], 0, 0, h_air, 0, r_air)
 air = Shape(model, 3, "air", [air])
-air.mesh_size = 0.05
+air.mesh_size = 0.1
 
-outside = occ.add_cylinder(0, -0.2, 0, 0, 0.4, 0, 1)  # to cut end of power supplies
+outside = occ.add_cylinder(X0_air[0], X0_air[1], 0, 0, h_air, 0, r_air*5)  # to cut end of power supplies
 occ.cut([(3, outside)], air.dimtags, removeTool=False)
 occ.cut(inductor.dimtags, [(3, outside)])
 
-occ.cut(air.dimtags, inductor.dimtags , removeTool=False)
-air.set_interface(inductor)
+occ.cut(air.dimtags, inductor.dimtags + feed.dimtags, removeTool=False)
+air.set_interfaces([inductor, feed])
 model.synchronize()
 
 surf_inductor = Shape(model, 2, "surf_inductor", inductor.get_interface(air))
+surf_feed = Shape(model, 2, "surf_feed", feed.get_interface(air))
 bnd_air = Shape(model, 2, "bnd_air", [x for x in air.boundaries if x not in air.get_interface(inductor)])
 inductor_ends = [x for x in inductor.boundaries if x not in inductor.get_interface(air)]
 bnd_supply_1 = Shape(model, 2, "bnd_supply_1", [inductor_ends[0]])
 bnd_supply_2 = Shape(model, 2, "bnd_supply_2", [inductor_ends[1]])
 
-model.show()
+# model.show()
+# inductor_inner_ring = Shape(model, 2, "inductor_inner_ring", [34])  # helper boundary for mesh refinement, extracted manually
+# feed_bot = Shape(model, 2, "feed_bot", [21])  # helper boundary for mesh refinement, extracted manually
 
 model.make_physical()
 
 model.deactivate_characteristic_length()
 model.set_const_mesh_sizes()
-MeshControlExponential(model, inductor, inductor.mesh_size, exp=1.6, fact=2)
+MeshControlExponential(model, inductor, inductor.mesh_size, exp=inductor_mesh_exp, fact=inductor_mesh_fact)
+MeshControlExponential(model, feed, feed.mesh_size, exp=feed_mesh_exp, fact=feed_mesh_fact)
 
 model.generate_mesh(3, optimize="Netgen", size_factor=mesh_size_factor)
-# if visualize:
-#     model.show()
+if visualize:
+    model.show()
 
 model.write_msh(f"{sim_dir}/case.msh")
 model.close_gmsh()
@@ -94,16 +137,17 @@ solver_mgdyn = elmer.load_solver("MGDynamics", sim, "./config_elmer.yml")
 solver_mgdyn.data.update({"Angular Frequency": 2*np.pi*frequency})
 solver_calc = elmer.load_solver("MGDynamicsCalc", sim, "./config_elmer.yml")
 solver_mgdyn.data.update({"Angular Frequency": 2*np.pi*frequency})
+solver_heat = elmer.load_solver("HeatSolver", sim, "./config_elmer.yml")
 solver_output = elmer.load_solver("ResultOutputSolver", sim, "./config_elmer.yml")
 
-eqn_main = elmer.Equation(sim, "eqn_main", [solver_mgdyn, solver_calc], {"name": "eqn_main"})
+eqn_main = elmer.Equation(sim, "eqn_main", [solver_mgdyn, solver_calc, solver_heat], {"name": "eqn_main"})
 
 mat_copper = elmer.load_material("copper-ibc", sim, "./config_elmer.yml")
 mat_copper.data.update({"name": "copper-ibc"})
 mat_air = elmer.load_material("air", sim, "./config_elmer.yml")
 mat_air.data.update({"name": "air"})
-# mat_tin = elmer.load_material("tin-ibc", sim, "./config_elmer.yml")
-# mat_tin.data.update({"name": "tin-ibc"})
+mat_tin = elmer.load_material("tin-ibc", sim, "./config_elmer.yml")
+mat_tin.data.update({"name": "tin-ibc"})
 
 inductor = elmer.Body(sim, "inductor", [inductor.ph_id], {"name": "inductor"})
 inductor.material = mat_copper
@@ -111,11 +155,22 @@ inductor.equation = eqn_main
 air = elmer.Body(sim, "air", [air.ph_id], {"name": "air"})
 air.material = mat_air
 air.equation = eqn_main
+feed = elmer.Body(sim, "feed", [feed.ph_id], {"name": "feed"})
+feed.material = mat_tin
+feed.equation = eqn_main
+
+joule_heat = elmer.BodyForce(sim, "joule_heat")
+joule_heat.data = {
+    "Temperature Load": 'Equals "Nodal Joule Heating"'
+}
+feed.body_force = joule_heat
+inductor.body_force = joule_heat
 
 bnd_air = elmer.Boundary(sim, "bnd_air", [bnd_air.ph_id], {"name": "bnd_air"})
 bnd_air.data.update({
     "AV re {e}": "Real 0.0",
     "AV im {e}": "Real 0.0",
+    "Temperature": 293.15,
 })
 bnd_supply_1 = elmer.Boundary(sim, "bnd_supply_1", [bnd_supply_1.ph_id], {"name": "bnd_supply_1"})
 bnd_supply_1.data.update({
@@ -133,8 +188,16 @@ surf_inductor = elmer.Boundary(sim, "surf_inductor", [surf_inductor.ph_id], {"na
 surf_inductor.data.update({
     "Layer Electric Conductivity": "Real 58.1e+6",  # TODO load that from config
     "Layer Relative Permeability": "Real 1",
+    "Temperature": 293.15,
 })
-
+surf_feed = elmer.Boundary(sim, "surf_feed", [surf_feed.ph_id], {"name": "surf_feed"})
+surf_feed.data.update({
+    "Layer Electric Conductivity": "Real 4.38e+6",  # TODO load that from config
+    "Layer Relative Permeability": "Real 1",
+    "Heat transfer coefficient": heat_transfer_coefficient,
+    "External Temperature": 293.15,
+    "Radiation": "Idealized"
+})
 bnd_current_supply = elmer.Boundary(sim, "bnd_current_supply", data={"name": "bnd_current_supply"})
 bnd_current_supply.data.update({
     "Intersection BC(2)": "Integer 1 2",  # TODO parameterize, this is prone for errors!!!

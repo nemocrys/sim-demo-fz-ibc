@@ -1,18 +1,7 @@
-process:
-  f: 644000 # Hz
-  sigma: 4380000 # S/m
-crystal:
-  l: 0.1  # 
-  r: 0.0039  # 
-  X0: [0, -0.05]
-  material: tin-solid
-  char_l: 0.001
 fz_crystal:
-  l: 0.285  # 
-  r: 0.00127  # 
-  r_min: 0.00404  # 
-  h_conus: 0.275  # 
-  X0: [0, 0.001]
+  l: 0.1  # 
+  r: 0.002  # 
+  X0: [0, -0.05]
   material: tin-solid
   char_l: 0.001    
 fz_inductor:
@@ -20,22 +9,15 @@ fz_inductor:
   r_outer: 0.04 # outer radius of inductor without coil
   r_outerCoil: 0.0465 # outer radius of inductor with coil
   r_bevel: 0.03 # radius of bevel corner
-  h_inner: 0.0005 # heigt of conductor at thinnest point
-  h_outer: 0.008  # height of conductor at thickest point
+  h_inner: 0.0005 # heigt of inductor at thinnest point
+  h_outer: 0.008  # height of inductor at thickest point
+  l_supply: 0.2
+  t_slit: 0.002
   material: copper
   char_l: 0.001  
 surrounding:  # vessel inner dimensions
-  X0: [0, -0.1]
+  X0: [0, -0.2]
   r: 0.2
-  h: 0.5
+  h: 0.4
   material: air
   char_l: 0.005  
-# inductor:
-#   d: 0.008  # outer coil diameter
-#   d_in: 0.004  # inner coil diameter
-#   X0: [0.043, 0.004]   #  coil position
-#   material: copper
-#   char_l: 0.001
-extrusion:
-  wedge_angle: 5 #degrees
-  extrusion_depth: 0.01
