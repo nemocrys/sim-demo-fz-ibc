@@ -19,11 +19,11 @@ with open("config_geo.yml") as f:
 
 sim_dir = "./simdata"
 
-current = 2.154/20*1000*np.sqrt(2)  # = 152 A; from 2.154V (108 A) Rogowski signal
-frequency = 634000  # Hz
+current = 1.86/20*1000*np.sqrt(2)  #
+frequency = 666000  # Hz
 heat_transfer_coefficient = 10 # W/m^2/K
 
-mesh_size_factor = 1  # increase for coarser, decrease for finer mesh
+mesh_size_factor = 2  # increase for coarser, decrease for finer mesh
 visualize = False  # must be false in docker container
 
 if not os.path.exists(sim_dir):
@@ -31,14 +31,14 @@ if not os.path.exists(sim_dir):
 
 ####################
 # mesh sizes
-inductor_mesh_size = 0.01
-feed_mesh_size = 0.01
-air_mesh_size = 0.1
+inductor_mesh_size = 0.001
+feed_mesh_size = 0.001
+air_mesh_size = 0.01
 
-inductor_mesh_exp = 1.8
+inductor_mesh_exp = 1.6
 inductor_mesh_fact = 2
 
-feed_mesh_exp = 1.8
+feed_mesh_exp = 1.6
 feed_mesh_fact = 2
 
 ####################
@@ -92,25 +92,27 @@ feed.mesh_size = feed_mesh_size
 
 air = occ.add_cylinder(X0_air[0], X0_air[1], 0, 0, h_air, 0, r_air)
 air = Shape(model, 3, "air", [air])
-air.mesh_size = 0.1
+air.mesh_size = air_mesh_size
 
 outside = occ.add_cylinder(X0_air[0], X0_air[1], 0, 0, h_air, 0, r_air*5)  # to cut end of power supplies
 occ.cut([(3, outside)], air.dimtags, removeTool=False)
 occ.cut(inductor.dimtags, [(3, outside)])
 
 occ.cut(air.dimtags, inductor.dimtags + feed.dimtags, removeTool=False)
-air.set_interfaces([inductor, feed])
+air.set_interface(inductor)
+air.set_interface(feed)
+
 model.synchronize()
+# model.show() 
 
 surf_inductor = Shape(model, 2, "surf_inductor", inductor.get_interface(air))
 surf_feed = Shape(model, 2, "surf_feed", feed.get_interface(air))
-bnd_air = Shape(model, 2, "bnd_air", [x for x in air.boundaries if x not in air.get_interface(inductor)])
+bnd_air = Shape(model, 2, "bnd_air", [x for x in air.boundaries if x not in air.get_interface(inductor) + air.get_interface(feed)])
 inductor_ends = [x for x in inductor.boundaries if x not in inductor.get_interface(air)]
 bnd_supply_1 = Shape(model, 2, "bnd_supply_1", [inductor_ends[0]])
 bnd_supply_2 = Shape(model, 2, "bnd_supply_2", [inductor_ends[1]])
 
-# model.show()
-# inductor_inner_ring = Shape(model, 2, "inductor_inner_ring", [34])  # helper boundary for mesh refinement, extracted manually
+inductor_inner_ring = Shape(model, 2, "inductor_inner_ring", [29])  # helper boundary for mesh refinement, extracted manually
 # feed_bot = Shape(model, 2, "feed_bot", [21])  # helper boundary for mesh refinement, extracted manually
 
 model.make_physical()
@@ -119,6 +121,7 @@ model.deactivate_characteristic_length()
 model.set_const_mesh_sizes()
 MeshControlExponential(model, inductor, inductor.mesh_size, exp=inductor_mesh_exp, fact=inductor_mesh_fact)
 MeshControlExponential(model, feed, feed.mesh_size, exp=feed_mesh_exp, fact=feed_mesh_fact)
+MeshControlExponential(model, inductor_inner_ring, inductor.mesh_size/4, exp=1.6, fact=2)
 
 model.generate_mesh(3, optimize="Netgen", size_factor=mesh_size_factor)
 if visualize:
@@ -198,6 +201,7 @@ surf_feed.data.update({
     "External Temperature": 293.15,
     "Radiation": "Idealized"
 })
+
 bnd_current_supply = elmer.Boundary(sim, "bnd_current_supply", data={"name": "bnd_current_supply"})
 bnd_current_supply.data.update({
     "Intersection BC(2)": "Integer 1 2",  # TODO parameterize, this is prone for errors!!!
