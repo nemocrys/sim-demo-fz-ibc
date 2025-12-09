@@ -9,10 +9,9 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
 from evaluation_pyvista import evaluate_crystal_temperature, evaluate_circle_temperature
-from evaluation_meas3dfields import read_exp_data, find_unique_r_values, find_unique_z_values, readAll_exp_data
 
 colors = ["C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9"]
-font = {'size'   : 24}
+font = {'size'   : 12}
 matplotlib.rc('font', **font)
 
 #### input
@@ -40,7 +39,7 @@ points2, T2 = evaluate_crystal_temperature(pvd_file, points2)
 T = T-273.15
 T2 = T2-273.15
 
-fig,ax = plt.subplots()
+fig,ax = plt.subplots(figsize=(3.8,5))
 ax.plot(T2, z*1000,color='tab:blue', label="3D-model")
 
 # ax.set_title("T on rod surface")
@@ -130,9 +129,3 @@ print(np.trapz(elmer_heatflux,z))
 print(np.trapz(elmer_heatflux,z)*2*np.pi*r_feed)
 
 print(np.trapz(elmer_radiative,z)*2*np.pi*r_feed)
-
-plt.show()
-plt.close(fig)
-
-
-
