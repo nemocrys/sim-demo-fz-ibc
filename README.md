@@ -20,7 +20,7 @@ The simulation uses ElmerFEM with an impedance boundary condition on the conduct
 Further settings can be found in the configuration file *config_elmer.ylm*.
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/fe744b13-a79e-4427-828d-f33c5d1d4167" alt="Experimental setup" width="48%">
+  <img src="https://github.com/user-attachments/assets/fe744b13-a79e-4427-828d-f33c5d1d4167" alt="Experimental setup" width="38%">
   <img src="https://github.com/user-attachments/assets/0369c727-7eec-4466-a097-c9381b9e65a3" alt="Setup sketch" width="48%">
 </p>
 
@@ -76,8 +76,8 @@ A selection of simulation results are shown here. For the complete verification 
 ### Domain and mesh
 Sketch of 3D-model simulation domain and (b) detailed view of mesh used in the 3D-model. The mesh consists of approximately 1.5 million elements. The smallest element size is 0.25 mm on the surface of the inductor hole
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/0a0d8edf-2b0f-4e75-9ef8-47c14306d899" alt="Elmer domain sketch" width="48%">
-  <img src="https://github.com/user-attachments/assets/fc4eb37b-5d45-4db0-85de-97a1caaaf12e" width="48%">
+  <img src="https://github.com/user-attachments/assets/0a0d8edf-2b0f-4e75-9ef8-47c14306d899" alt="Elmer domain sketch" width="28%">
+  <img src="https://github.com/user-attachments/assets/fc4eb37b-5d45-4db0-85de-97a1caaaf12e" alt="Elmer mesh" width="48%">
 </p>
 
 ## Results
