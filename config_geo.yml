@@ -1,0 +1,23 @@
+fz_crystal:
+  l: 0.30  # 
+  r: 0.003425  # 
+  X0: [0, -0.15]
+  material: tin-solid
+  char_l: 0.001    
+fz_inductor:
+  r_inner: 0.004 # inner radius of inductor
+  r_outer: 0.04 # outer radius of inductor without coil
+  r_outerCoil: 0.0465 # outer radius of inductor with coil
+  r_bevel: 0.03 # radius of bevel corner
+  h_inner: 0.0005 # heigt of inductor at thinnest point
+  h_outer: 0.008  # height of inductor at thickest point
+  l_supply: 0.2
+  t_slit: 0.002
+  material: copper
+  char_l: 0.001  
+surrounding:  # vessel inner dimensions
+  X0: [0, -0.3]
+  r: 0.2
+  h: 0.6
+  material: air
+  char_l: 0.005  
