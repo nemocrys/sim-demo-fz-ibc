@@ -17,13 +17,17 @@ occ = gmsh.model.occ
 with open("config_geo.yml") as f:
         config_geo = yaml.safe_load(f)
 
+with open("config_elmer.yml") as f:
+        config_elmer = yaml.safe_load(f)
+
 sim_dir = "./simdata"
 
+## sim inputs
 current = 1.838/20*1000*np.sqrt(2)  #
 frequency = 672000  # Hz
 heat_transfer_coefficient = 9.58 # W/m^2/K
+mesh_size_factor = 2  # global increase for coarser, decrease for finer mesh
 
-mesh_size_factor = 1  # increase for coarser, decrease for finer mesh
 visualize = False  # must be false in docker container
 
 if not os.path.exists(sim_dir):
@@ -32,6 +36,7 @@ if not os.path.exists(sim_dir):
 ####################
 # mesh sizes
 inductor_mesh_size = 0.001
+mesh_inductor_refinement = 4
 feed_mesh_size = 0.001
 air_mesh_size = 0.01
 
@@ -42,6 +47,7 @@ feed_mesh_exp = 1.6
 feed_mesh_fact = 2
 
 ####################
+# Inductor geometry, single turn flat inductor with power supplies
 r_inner = config_geo["fz_inductor"]["r_inner"]
 r_outer = config_geo["fz_inductor"]["r_outer"]
 r_outerCoil = config_geo["fz_inductor"]["r_outerCoil"]
@@ -53,6 +59,7 @@ t_slit = config_geo["fz_inductor"]["t_slit"]
 r_coil = h_outer/2
 r_conus = np.polyfit(np.array([h_inner, h_outer]),np.array([r_inner, r_bevel]),1)[1]
 
+# dummy rod geometry
 X0_feed = config_geo["fz_crystal"]["X0"]
 r_feed = config_geo["fz_crystal"]["r"]
 l_feed = config_geo["fz_crystal"]["l"]
@@ -62,17 +69,14 @@ r_air = config_geo["surrounding"]["r"]
 h_air = config_geo["surrounding"]["h"]
 
 ####################
-
-
-
 # geometry modeling
 model = Model()
 
 coil_body = occ.add_cylinder(0, 0, 0, 0, h_outer, 0, r_outer)
 supply_1 = occ.add_cylinder(r_coil + t_slit/2, r_coil, 0, 0, 0, l_supply, r_coil)
 supply_2 = occ.add_cylinder(-r_coil - t_slit/2, r_coil, 0, 0, 0, l_supply, r_coil)
-# addTorus(x, y, z, r1, r2, tag=-1, angle=2*pi, zAxis=[]):
 coil_torus = occ.add_torus(0, r_coil, 0, r_outer, r_coil, zAxis = [0, 1, 0])
+
 # model.synchronize()
 # model.show()
 
@@ -121,7 +125,7 @@ model.deactivate_characteristic_length()
 model.set_const_mesh_sizes()
 MeshControlExponential(model, inductor, inductor.mesh_size, exp=inductor_mesh_exp, fact=inductor_mesh_fact)
 MeshControlExponential(model, feed, feed.mesh_size, exp=feed_mesh_exp, fact=feed_mesh_fact)
-MeshControlExponential(model, inductor_inner_ring, inductor.mesh_size/4, exp=1.6, fact=2)
+MeshControlExponential(model, inductor_inner_ring, inductor.mesh_size/mesh_inductor_refinement, exp=1.6, fact=2)
 
 model.generate_mesh(3, optimize="Netgen", size_factor=mesh_size_factor)
 if visualize:
@@ -171,6 +175,9 @@ joule_heat.data = {
 feed.body_force = joule_heat
 inductor.body_force = joule_heat
 
+layer_cond_tin = config_elmer["tin-ibc"]["Layer Electric Conductivty"]
+layer_cond_copper = config_elmer["copper-ibc"]["Layer Electric Conductivty"]
+
 bnd_air = elmer.Boundary(sim, "bnd_air", [bnd_air.ph_id], {"name": "bnd_air"})
 bnd_air.data.update({
     "AV re {e}": "Real 0.0",
@@ -191,13 +198,13 @@ bnd_supply_2.data.update({
 })
 surf_inductor = elmer.Boundary(sim, "surf_inductor", [surf_inductor.ph_id], {"name": "surf_inductor"})
 surf_inductor.data.update({
-    "Layer Electric Conductivity": "Real 58.1e+6",  # TODO load that from config
+    "Layer Electric Conductivity": f"Real {layer_cond_copper}",
     "Layer Relative Permeability": "Real 1",
     "Temperature": 293.15,
 })
 surf_feed = elmer.Boundary(sim, "surf_feed", [surf_feed.ph_id], {"name": "surf_feed"})
 surf_feed.data.update({
-    "Layer Electric Conductivity": "Real 4.38e+6",  # TODO load that from config
+    "Layer Electric Conductivity": f"Real {layer_cond_tin}",
     "Layer Relative Permeability": "Real 1",
     "Heat transfer coefficient": heat_transfer_coefficient,
     "External Temperature": 293.15,

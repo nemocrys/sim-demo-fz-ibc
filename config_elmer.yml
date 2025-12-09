@@ -97,7 +97,8 @@ calculateIntegralValues:
 # Materials
 copper-ibc:
   Density: 8960.0  # 0°C
-  Electric Conductivity: 0.0 #58.1e+6  # 20°C
+  Electric Conductivity: 0.0 # Has to be zero for IBC
+  Layer Electric Conductivty: 58.1e+6 # at 20°C
   Emissivity: 0.2  # 327°C
   Heat Capacity: 384.4  # interpolated for 20°C
   Heat Conductivity: 390.0  # estimated using data sheets
@@ -112,7 +113,8 @@ air:
   Relative Permittivity: 1
 tin-ibc:
   Density: 7179.0
-  Electric Conductivity: 0.0 # 4.38e+6
+  Electric Conductivity: 0.0 # Has to be zero for IBC
+  Layer Electric Conductivity: 4.38e+6
   Emissivity: 0.064
   Heat Capacity: 244.0
   Heat Conductivity: 60.0
