@@ -10,7 +10,6 @@ from pyelmer.post import scan_logfile
 occ = gmsh.model.occ
 
 
-
 ####################
 # parameters
 
@@ -29,6 +28,8 @@ heat_transfer_coefficient = 9.58 # W/m^2/K
 mesh_size_factor = 2  # global increase for coarser, decrease for finer mesh
 
 visualize = False  # must be false in docker container
+
+feed_shift = 1.e-3 # moves feed to the top, if positive
 
 if not os.path.exists(sim_dir):
     os.makedirs(sim_dir)
@@ -120,6 +121,7 @@ inductor_inner_ring = Shape(model, 2, "inductor_inner_ring", [29])  # helper bou
 # feed_bot = Shape(model, 2, "feed_bot", [21])  # helper boundary for mesh refinement, extracted manually
 
 model.make_physical()
+
 
 model.deactivate_characteristic_length()
 model.set_const_mesh_sizes()
