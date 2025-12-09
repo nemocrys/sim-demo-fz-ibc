@@ -95,7 +95,7 @@ The figure below shows the comparison of temperature profiles on the rod surface
 
 Heat flows were analyzed with ElmerFEM and Paraview. The Joule heat is storedn in the field *nodal joule heating* which is in W. The sum is calculated in Elmer with the *SaveScalars* procedure and yields the total induced power of 8.85W. However, with this apprach an induced power of 62.38W is calulated in the air, which is unphysical.
 
-The heat flow on the rod surface is calculated as 1.8W by Elmer. A simple approach of calculating the radiative and conductive heat transfer from the temperature field after the simulation (done in the paraview fiel *state.pvsm*) yields 6.74W.
+The heat flow on the rod surface is calculated as 1.8W by Elmer (with the *diffusive heat flux* operator). A simple approach of calculating the radiative and conductive heat transfer from the temperature field after the simulation (done in the paraview fiel *state.pvsm*) yields 6.74W.
 
 Below is a summary of the calulated heat fluxes.
 
