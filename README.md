@@ -20,11 +20,12 @@ The simulation uses ElmerFEM with an impedance boundary condition on the conduct
 Further settings can be found in the configuration file *config_elmer.ylm*.
 
 <p align="center">
-  <img src="figures/FIG_Demo-Fz-Setup-annotated-zoom.png" alt="Experimental setup" width="48%">
-  <img src="figures/FIG_Demo-Fz-Sketch.png" alt="Setup sketch" width="48%">
+  <img src="https://github.com/user-attachments/assets/fe744b13-a79e-4427-828d-f33c5d1d4167" alt="Experimental setup" width="48%">
+  <img src="https://github.com/user-attachments/assets/0369c727-7eec-4466-a097-c9381b9e65a3" alt="Setup sketch" width="48%">
 </p>
 
 ### Configuration
+
 
 The configuration of the simulation is stored in yml-files. Process parameters (frequency, current) and mesh configuration can be found at the top of *simulation.py*.
 
@@ -75,11 +76,12 @@ A selection of simulation results are shown here. For the complete verification 
 ### Domain and mesh
 Sketch of 3D-model simulation domain and (b) detailed view of mesh used in the 3D-model. The mesh consists of approximately 1.5 million elements. The smallest element size is 0.25 mm on the surface of the inductor hole
 <p align="center">
-  <img src="figures/FIG_elmer-sketch.png" alt="Elmer domain sketch" width="48%">
-  <img src="figures/FIG_elmer-mesh-zoom.png" alt="Elmer mesh detail" width="48%">
+  <img src="https://github.com/user-attachments/assets/0a0d8edf-2b0f-4e75-9ef8-47c14306d899" alt="Elmer domain sketch" width="48%">
+  <img src="https://github.com/user-attachments/assets/fc4eb37b-5d45-4db0-85de-97a1caaaf12e" width="48%">
 </p>
 
 ## Results
+
  Magnetic field lines of 𝐁𝐼𝑚 in the air domain around the inductor, colored with |𝐁| using a logarithmic scale. The surface current distribution |𝐣| on the rod and inductor is also shown. Half of the inductor, cut through the main slit, is shown. Magnetic flux density magnitude distribution
 
 ![Magnetic field lines](figures/elmer-results-field-lines.png)
@@ -87,8 +89,7 @@ Sketch of 3D-model simulation domain and (b) detailed view of mesh used in the 3
 ## Power and temperatures
 The power is calculated with XX. The total induced power is 8.85 W.
 Teh figure below shows the omparison of temperature profiles on the rod surface. The measured profile was extracted from the thermal image. The profile for the 3D-model was taken at 𝛼 = 180◦.
-
-![Temperature profiles](figures/sim_temperature_htc9.png)
+<img width="28%" alt="sim_temperature_htc9" src="https://github.com/user-attachments/assets/2516c6d4-9c62-4659-8660-5abb431869b1" />
 
 ## Acknowledgements
 
