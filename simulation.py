@@ -27,6 +27,10 @@ frequency = 672000  # Hz
 heat_transfer_coefficient = 9.58 # W/m^2/K
 mesh_size_factor = 2  # global increase for coarser, decrease for finer mesh
 
+## ibc conductivities
+layer_cond_copper = 58.1e6
+layer_cond_tin = 4.38e6
+
 visualize = False  # must be false in docker container
 
 feed_shift = 1.e-3 # moves feed to the top, if positive
@@ -176,9 +180,6 @@ joule_heat.data = {
 }
 feed.body_force = joule_heat
 inductor.body_force = joule_heat
-
-layer_cond_tin = config_elmer["tin-ibc"]["Layer Electric Conductivty"]
-layer_cond_copper = config_elmer["copper-ibc"]["Layer Electric Conductivty"]
 
 bnd_air = elmer.Boundary(sim, "bnd_air", [bnd_air.ph_id], {"name": "bnd_air"})
 bnd_air.data.update({
