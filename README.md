@@ -92,6 +92,8 @@ Post-processing is done in paraview and with Python. The file *evaluation_pyvist
 The total induced power in this simulation is 8.85 W. Specificylly this is the sum of the nodal joule heating in the results. It is calculated in Elmer with the *SaveScalars* procedure. 
 
 The figure below shows the omparison of temperature profiles on the rod surface. The measured profile was extracted from the thermal image. The profile for the 3D-model was taken at 𝛼 = 180◦.
+
+
 <img width="28%" alt="sim_temperature_htc9" src="https://github.com/user-attachments/assets/2516c6d4-9c62-4659-8660-5abb431869b1" />
 
 ## Acknowledgements
