@@ -8,7 +8,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 # from matplotlib.ticker import FuncFormatter
 
 
-from evaluation_pyvista import evaluate_crystal_temperature, evaluate_circle_temperature
+from evaluation_pyvista import evaluate_crystal_temperature, evaluate_circle_temperature, return_sum_nodal_heat
 
 colors = ["C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9"]
 font = {'size'   : 12}
@@ -129,3 +129,8 @@ print(np.trapz(elmer_heatflux,z))
 print(np.trapz(elmer_heatflux,z)*2*np.pi*r_feed)
 
 print(np.trapz(elmer_radiative,z)*2*np.pi*r_feed)
+
+print(f'Sum nodal joule heat feed  = {return_sum_nodal_heat("simdata/results/case_feed_t0002.vtu")} W')
+print(f'Sum nodal joule heat inductor  = {return_sum_nodal_heat("simdata/results/case_inductor_t0002.vtu")} W')
+print(f'Sum nodal joule heat air  = {return_sum_nodal_heat("simdata/results/case_air_t0002.vtu")} W')
+print(f'Sum nodal joule heat total  = {return_sum_nodal_heat(pvd_file, True)} W')

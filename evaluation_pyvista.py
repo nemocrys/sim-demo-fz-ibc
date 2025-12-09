@@ -158,6 +158,25 @@ def evaluate_circle_temperature(pvd_file, r, z, resolution=1000, plot=False):
     
     return phi, values
 
+def return_sum_nodal_heat(pvd_file, combine=False):
+    # read pvd
+    reader = pv.get_reader(pvd_file)
+    mesh = reader.read()
+    if combine:
+        mesh = mesh.combine()  # combine different blocks (different vtu files) to one mesh
+    # print(mesh.array_names)
+    field = mesh["nodal joule heating"]      # replace with your field name
+    sum = field.sum()
+
+    cell_mesh = mesh.point_data_to_cell_data()
+    field_cell = cell_mesh["nodal joule heating"]
+    volumes = cell_mesh.compute_cell_sizes()["Volume"]
+    integral = np.sum(field_cell * volumes)
+    # print("Integral:", integral)
+    # print("Raw sum:", sum)
+
+    return sum
+
 if __name__ == "__main__":
     pvd_file = "simdata_size-factor=2_discontinuous-bodies/results/case.pvd"
 

@@ -204,6 +204,7 @@ surf_inductor.data.update({
     "Layer Electric Conductivity": f"Real {layer_cond_copper}",
     "Layer Relative Permeability": "Real 1",
     "Temperature": 293.15,
+    "Save Scalars": "Logical True",
 })
 surf_feed = elmer.Boundary(sim, "surf_feed", [surf_feed.ph_id], {"name": "surf_feed"})
 surf_feed.data.update({
@@ -212,6 +213,7 @@ surf_feed.data.update({
     "Heat transfer coefficient": heat_transfer_coefficient,
     "External Temperature": 293.15,
     "Radiation": "Idealized"
+    "Save Scalars": "Logical True",
 })
 
 bnd_current_supply = elmer.Boundary(sim, "bnd_current_supply", data={"name": "bnd_current_supply"})
