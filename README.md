@@ -2,7 +2,7 @@
 
 **Zenodo reference**
 
-Mangetic field and thermal simulation of simple Floating Zone configuration with one-turn flat inductor.
+Mangetic field and thermal simulation of simple Floating Zone configuration with one-turn flat inductor using the impedance-boundary condition in ElmerFEM.
 
 The project is developed and maintained by the [**Model experiments group**](https://www.ikz-berlin.de/en/research/materials-science/section-fundamental-description#c486) at the Leibniz Institute for Crystal Growth (IKZ).
 
@@ -14,7 +14,7 @@ If you use this code in your research, please cite our open-access publication:
 
 ## Overview
 
-3D numerical simulation for high-frequency induction heating in the FZ process for comparison with magnetic and thermal measurements. The geometry of the experimntal setup is shown below. The current in the experiment and simulation was set to 130A, the frequency is 672kHz.
+3D numerical simulation for high-frequency induction heating in the FZ process for comparison with magnetic and thermal measurements. The geometry of the experimental setup is shown below. The current in the experiment and simulation was set to 130A, the frequency is 672kHz.
 
 The simulation uses ElmerFEM with an impedance boundary condition on the conducting surfaces. The heat transfer simulation includes indcution heating, conduction and surface-to-ambient radiation and convection.
 Further settings can be found in the configuration file *config_elmer.ylm*.
@@ -38,7 +38,7 @@ The geometry and simulation setup are defined in *simulation.py*.
 
 ### Execution
 
-If the required python packages and elmer solver are installed simulations can be executed with the script *simulation.py.
+If the required python packages and elmer solver are installed simulations can be executed with the script *simulation.py*.
 
 Usage of docker is highly recommended, see next section.
 
@@ -71,7 +71,7 @@ docker run -it --rm -v $PWD:/home/workdir -e LOCAL_UID=$(id -u $USER) -e LOCAL_G
 The simulation can then be run by executing *python3 simulation.py* inside the docker container.
 
 ## Results
-A selection of simulation results are shown here. For the complete verification and comparison with experiments refer to TODO: Add ref
+A selection of simulation results are shown here. For the complete verification and comparison with experiments refer to the paper above.
 
 ### Domain and mesh
 Sketch of 3D-model simulation domain and (b) detailed view of mesh used in the 3D-model. The mesh consists of approximately 1.5 million elements. The smallest element size is 0.25 mm on the surface of the inductor hole
@@ -80,15 +80,19 @@ Sketch of 3D-model simulation domain and (b) detailed view of mesh used in the 3
   <img src="https://github.com/user-attachments/assets/fc4eb37b-5d45-4db0-85de-97a1caaaf12e" alt="Elmer mesh" width="48%">
 </p>
 
-## Results
+## Post-processing
+Post-processing is done in paraview and with Python. The file *evaluation_pyvista.py* contains helper functions for getting data from the vtk to python. The library *pyvista* is required.
+
+### Magnetic Field
 
  Magnetic field lines of 𝐁𝐼𝑚 in the air domain around the inductor, colored with |𝐁| using a logarithmic scale. The surface current distribution |𝐣| on the rod and inductor is also shown. Half of the inductor, cut through the main slit, is shown. Magnetic flux density magnitude distribution
 
 ![Magnetic field lines](figures/elmer-results-field-lines.png)
 
 ## Power and temperatures
-The power is calculated with XX. The total induced power is 8.85 W.
-Teh figure below shows the omparison of temperature profiles on the rod surface. The measured profile was extracted from the thermal image. The profile for the 3D-model was taken at 𝛼 = 180◦.
+The total induced power in this simulation is 8.85 W. Specificylly this is the sum of the nodal joule heating in the results. It is calculated in Elmer with the *SaveScalars* procedure. 
+
+The figure below shows the omparison of temperature profiles on the rod surface. The measured profile was extracted from the thermal image. The profile for the 3D-model was taken at 𝛼 = 180◦.
 <img width="28%" alt="sim_temperature_htc9" src="https://github.com/user-attachments/assets/2516c6d4-9c62-4659-8660-5abb431869b1" />
 
 ## Acknowledgements
