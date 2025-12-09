@@ -14,13 +14,12 @@ If you use this code in your research, please cite our open-access publication:
 
 ## Overview
 
-3D numerical simulation for high-frequency induction heating in the FZ process for comparison with magnetic and thermal measurements. The geometry of the experimental setup is shown below. The current in the experiment and simulation was set to 130A, the frequency is 672kHz.
+3D numerical simulation for high-frequency induction heating in the FZ process for comparison with magnetic and thermal measurements. The geometry of the setup is shown below. The current in the experiment and simulation was set to 130A, the frequency is 672kHz.
 
 The simulation uses ElmerFEM with an impedance boundary condition on the conducting surfaces. The heat transfer simulation includes indcution heating, conduction and surface-to-ambient radiation and convection.
 Further settings can be found in the configuration file *config_elmer.ylm*.
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/fe744b13-a79e-4427-828d-f33c5d1d4167" alt="Experimental setup" width="38%">
   <img src="https://github.com/user-attachments/assets/0369c727-7eec-4466-a097-c9381b9e65a3" alt="Setup sketch" width="48%">
 </p>
 
