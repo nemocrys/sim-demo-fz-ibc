@@ -93,9 +93,9 @@ The figure below shows the comparison of temperature profiles on the rod surface
 
 <img width="28%" alt="sim_temperature_htc9" src="https://github.com/user-attachments/assets/2516c6d4-9c62-4659-8660-5abb431869b1" />
 
-Heat flows were analyzed with ElmerFEM and Paraview. The Joule heat is storedn in the field *nodal joule heating* which is in W. The sum is calculated in Elmer with the *SaveScalars* procedure and yields the total induced power of 8.85W. However, with this apprach an induced power of 62.38W is calulated in the air, which is unphysical.
+Heat flows were analyzed with ElmerFEM and Paraview. The Joule heat is storedn in the field *nodal joule heating* which is in W. The sum is calculated in Elmer with the *SaveScalars* procedure and yields the total induced power of 8.85W. Note that this approach also formally produces an (unphysical) induced power of 62.38W is the air.
 
-The heat flow on the rod surface is calculated as 1.8W by Elmer (with the *diffusive heat flux* operator). A simple approach of calculating the radiative and conductive heat transfer from the temperature field after the simulation (done in the paraview fiel *state.pvsm*) yields 6.74W.
+The heat flow on the rod surface is calculated as 1.8W by Elmer (with the *diffusive heat flux* operator). A simple approach of calculating the radiative and conductive heat losses from the known surface temperature distribution after the simulation (done in the paraview fiel *state.pvsm*) yields 6.74W.
 
 Below is a summary of the calulated heat fluxes.
 
@@ -103,7 +103,6 @@ Below is a summary of the calulated heat fluxes.
 | -------- | ------- | ------- |
 | Induced power on feed rod   | 8.85W | 8.85W |
 | Induced power on inductor   | 53.52W | 53.525W |
-| Induced power on air         | 62.38W | 62.38W |
 | Total heat over feed rod boundary | 1.86W | 6.74W |
 
 
