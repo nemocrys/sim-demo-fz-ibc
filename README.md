@@ -84,9 +84,8 @@ Post-processing is done in paraview and with Python. The file *evaluation_pyvist
 
 ### Magnetic Field
 
- Magnetic field lines of 𝐁𝐼𝑚 in the air domain around the inductor, colored with |𝐁| using a logarithmic scale. The surface current distribution |𝐣| on the rod and inductor is also shown. Half of the inductor, cut through the main slit, is shown. Magnetic flux density magnitude distribution
-
-![Magnetic field lines](figures/elmer-results-field-lines.png)
+ Magnetic field lines of the imaginary part of 𝐁 in the air domain around the inductor, colored with |𝐁| using a logarithmic scale. The surface current distribution |𝐣| on the rod and inductor is also shown. Half of the inductor, cut through the main slit, is shown. Magnetic flux density magnitude distribution
+<img width="48%" alt="FIG_elmer-results-field-lines" src="https://github.com/user-attachments/assets/6239f531-5a82-4e6f-bfce-594cf6ad0945" />
 
 ## Temperatures and heat fluxes
 
