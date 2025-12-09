@@ -1,7 +1,7 @@
 fz_crystal:
-  l: 0.4  # 
-  r: 0.00277  # 
-  X0: [0, -0.2]
+  l: 0.30  # 
+  r: 0.003425  # 
+  X0: [0, -0.15]
   material: tin-solid
   char_l: 0.001    
 fz_inductor:
@@ -16,8 +16,8 @@ fz_inductor:
   material: copper
   char_l: 0.001  
 surrounding:  # vessel inner dimensions
-  X0: [0, -0.2]
+  X0: [0, -0.3]
   r: 0.2
-  h: 0.4
+  h: 0.6
   material: air
   char_l: 0.005  

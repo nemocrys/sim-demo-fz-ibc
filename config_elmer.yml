@@ -29,7 +29,7 @@ MGDynamicsCalc:
   Calculate Joule Heating: True
   Calculate Nodal Heating: True
   Steady State Convergence Tolerance: 1e-06
-  Calculate Nodal Fields: False
+  Calculate Nodal Fields: True
   Calculate Elemental Fields: True
   Linear System Solver: Iterative
   Linear System Preconditioning: ILU0
@@ -69,7 +69,31 @@ ResultOutputSolver:
   Save Bulk Only: True
   Output Directory: results
   Output File name: case
-  Discontinuous Bodies: True
+  # Discontinuous Bodies: False
+calculateIntegralValues:
+  Exec Solver: after Timestep
+  Equation: String SaveScalars
+  Procedure: 'File "SaveData" "SaveScalars"'
+  Filename: 'File "calculate.dat"'
+  Variable 1: String Temperature
+  Operator 1: String max
+  Variable 2: String Temperature
+  Operator 2: String min
+  Variable 3: String Temperature
+  Operator 3: String body volume
+  Mask Name 3: air body
+  Variable 4: String Temperature
+  Operator 4: String body volume
+  Mask Name 4: feed body
+  Variable 5: String nodal joule heating
+  Operator 5: String body sum
+  Mask Name 5: air body
+  Variable 6: String nodal joule heating
+  Operator 6: String body sum
+  Mask Name 6: feed body
+  Variable 7: String nodal joule heating
+  Operator 7: String body sum
+  Mask Name 7: inductor body   
 # Materials
 copper-ibc:
   Density: 8960.0  # 0°C

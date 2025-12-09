@@ -19,11 +19,11 @@ with open("config_geo.yml") as f:
 
 sim_dir = "./simdata"
 
-current = 1.86/20*1000*np.sqrt(2)  #
-frequency = 666000  # Hz
-heat_transfer_coefficient = 10 # W/m^2/K
+current = 1.838/20*1000*np.sqrt(2)  #
+frequency = 672000  # Hz
+heat_transfer_coefficient = 9.58 # W/m^2/K
 
-mesh_size_factor = 2  # increase for coarser, decrease for finer mesh
+mesh_size_factor = 1  # increase for coarser, decrease for finer mesh
 visualize = False  # must be false in docker container
 
 if not os.path.exists(sim_dir):
@@ -142,6 +142,7 @@ solver_calc = elmer.load_solver("MGDynamicsCalc", sim, "./config_elmer.yml")
 solver_mgdyn.data.update({"Angular Frequency": 2*np.pi*frequency})
 solver_heat = elmer.load_solver("HeatSolver", sim, "./config_elmer.yml")
 solver_output = elmer.load_solver("ResultOutputSolver", sim, "./config_elmer.yml")
+solver_post = elmer.load_solver("calculateIntegralValues", sim, "./config_elmer.yml")
 
 eqn_main = elmer.Equation(sim, "eqn_main", [solver_mgdyn, solver_calc, solver_heat], {"name": "eqn_main"})
 
@@ -152,13 +153,14 @@ mat_air.data.update({"name": "air"})
 mat_tin = elmer.load_material("tin-ibc", sim, "./config_elmer.yml")
 mat_tin.data.update({"name": "tin-ibc"})
 
-inductor = elmer.Body(sim, "inductor", [inductor.ph_id], {"name": "inductor"})
+inductor = elmer.Body(sim, "inductor", [inductor.ph_id], {"name": "inductor", "inductor body": "Logical True"})
 inductor.material = mat_copper
 inductor.equation = eqn_main
-air = elmer.Body(sim, "air", [air.ph_id], {"name": "air"})
+air = elmer.Body(sim, "air", [air.ph_id], {"name": "air", "air body": "Logical True"})
 air.material = mat_air
 air.equation = eqn_main
-feed = elmer.Body(sim, "feed", [feed.ph_id], {"name": "feed"})
+
+feed = elmer.Body(sim, "feed", [feed.ph_id], {"name": "feed", "feed body": "Logical True"})
 feed.material = mat_tin
 feed.equation = eqn_main
 
