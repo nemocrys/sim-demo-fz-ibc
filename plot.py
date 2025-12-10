@@ -124,13 +124,12 @@ elmer_T = T2 + 273.15
 elmer_heatflux = (sigmaB * epsilon * (elmer_T**4 - Tamb**4) + htc*(elmer_T-Tamb))
 elmer_radiative = (sigmaB * epsilon * (elmer_T**4 - Tamb**4))
 
-print(np.trapz(elmer_heatflux,z))
+# print(np.trapz(elmer_heatflux,z))
 
-print(np.trapz(elmer_heatflux,z)*2*np.pi*r_feed)
+print(f'Qcond = {np.trapz(elmer_heatflux,z)*2*np.pi*r_feed}')
 
-print(np.trapz(elmer_radiative,z)*2*np.pi*r_feed)
+print(f'Qrad = {np.trapz(elmer_radiative,z)*2*np.pi*r_feed}')
 
 print(f'Sum nodal joule heat feed  = {return_sum_nodal_heat("simdata/results/case_feed_t0002.vtu")} W')
 print(f'Sum nodal joule heat inductor  = {return_sum_nodal_heat("simdata/results/case_inductor_t0002.vtu")} W')
-print(f'Sum nodal joule heat air  = {return_sum_nodal_heat("simdata/results/case_air_t0002.vtu")} W')
 print(f'Sum nodal joule heat total  = {return_sum_nodal_heat(pvd_file, True)} W')

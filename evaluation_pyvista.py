@@ -61,13 +61,13 @@ def evaluate_circle(pvd_file, r, z, resolution=1000, plot=False):
 
     # evaluate pvd
     point_set = pv.PointSet(points)
-    probe = mesh.probe(point_set)
-    values = ((probe["magnetic flux density re e"]**2 + probe["magnetic flux density im e"]**2))**0.5
-    # values = probe["magnetic flux density im e"]
+    probe = point_set.sample(point_set)
+    values = ((probe.point_data["magnetic flux density re e"]**2 + probe.point_data["magnetic flux density im e"]**2))**0.5
+    # values = probe.point_data["magnetic flux density im e"]
     # print(points.shape[0])
     # for i in range(0, points.shape[0]):
     #     virtualProbe = virtual_probe(pvd_file, points[i,:])
-    #     print(f'point = {points[i,:]} \t values = {values[i,:]} \t virtualProbe = {virtualProbe[i,:]}')
+    #     print(f'point = {points[i,:]} \t values = {values[i,:]} \t virtualProbe = {virtualprobe.point_data[i,:]}')
 
     if plot:
         fig, ax = plt.subplots()
@@ -89,8 +89,8 @@ def evaluate_vertical_line(pvd_file, r, phi, z_start, z_end, resolution=100, plo
 
     # evaluate pvd
     point_set = pv.PointSet(points)
-    probe = mesh.probe(point_set)
-    values = probe["magnetic flux density im e"][:, 1]
+    probe = point_set.sample(mesh)
+    values = probe.point_data["magnetic flux density im e"][:, 1]
 
     if plot:
         fig, ax = plt.subplots()
@@ -108,12 +108,12 @@ def evaluate_line(pvd_file, points, plot=False):
 
     # evaluate pvd
     point_set = pv.PointSet(points)
-    probe = mesh.probe(point_set)
-    values = ((probe["magnetic flux density re e"]**2 + probe["magnetic flux density im e"]**2))**0.5
+    probe = point_set.sample(mesh)
+    values = ((probe.point_data["magnetic flux density re e"]**2 + probe.point_data["magnetic flux density im e"]**2))**0.5
 
     if plot:
         fig, ax = plt.subplots()
-        ax.plot(z, values)
+        ax.plot(points[:,1], values)
         plt.show()
     
     return points, values
@@ -127,8 +127,8 @@ def evaluate_crystal_temperature(pvd_file, points, plot=False):
 
     # evaluate pvd
     point_set = pv.PointSet(points)
-    probe = mesh.probe(point_set)
-    values = probe["temperature"]
+    probe = point_set.sample(mesh)
+    values = probe.point_data['temperature']
 
     return points, values
 
@@ -147,9 +147,9 @@ def evaluate_circle_temperature(pvd_file, r, z, resolution=1000, plot=False):
 
     # evaluate pvd
     point_set = pv.PointSet(points)
-    probe = mesh.probe(point_set)
-    values = probe["temperature"]
-    # values = ((probe["magnetic flux density re e"]**2 + probe["magnetic flux density im e"]**2))**0.5
+    probe = point_set.sample(mesh)
+    values = probe.point_data["temperature"]
+    # values = ((probe.point_data["magnetic flux density re e"]**2 + probe.point_data["magnetic flux density im e"]**2))**0.5
 
     if plot:
         fig, ax = plt.subplots()
@@ -176,6 +176,75 @@ def return_sum_nodal_heat(pvd_file, combine=False):
     # print("Raw sum:", sum)
 
     return sum
+
+def compute_heat_flux_from_vtu(vtu_file, k):
+    """
+    Load a VTU file, convert point->cell data,
+    compute temperature gradient and boundary heat flux.
+
+    Parameters
+    ----------
+    vtu_file : str
+        Path to .vtu file.
+    k : float
+        Thermal conductivity [W/(m·K)].
+
+    Returns
+    -------
+    total_flux : float
+        Total outward heat flux [W].
+    q_surf : np.ndarray
+        Heat flux vector at boundary cells (shape: n_boundary_cells x 3).
+    """
+
+    # --- Load file ---
+    mesh = pv.read(vtu_file)
+
+    # --- convert point data to cell data ---
+    cell_mesh = mesh.point_data_to_cell_data()
+
+    # make sure the temperature field exists
+    if "temperature" not in cell_mesh.cell_data:
+        raise KeyError(
+            f"Temperature field 'temperature' not found in VTU. "
+            f"Available cell arrays: {list(cell_mesh.cell_data.keys())}"
+        )
+
+    # --- compute gradient of temperature (cell data) ---
+    # use compute_derivative (vtkGradientFilter wrapper)
+    grad_mesh = cell_mesh.compute_derivative(
+        scalars="temperature",
+        gradient="gradT",    # name of resulting gradient array
+        preference="cell",   # we want the cell-data field
+    )
+
+    # gradient is now a cell array (n_cells x 3)
+    gradT = grad_mesh.cell_data["gradT"]
+
+    # --- compute heat flux vector: q = -k * gradT ---
+    q = -k * gradT
+    grad_mesh.cell_data["q"] = q
+
+    # --- extract external surface ---
+    surf = grad_mesh.extract_surface()
+
+    # compute cell normals on the surface
+    surf = surf.compute_normals(cell_normals=True, point_normals=False)
+
+    # get normals and flux as *cell data* on the surface
+    normals = surf.cell_data["Normals"]   # shape: (n_surf_cells, 3)
+    q_surf = surf.cell_data["q"]          # shape: (n_surf_cells, 3)
+
+    # --- normal heat flux qn = q · n ---
+    qn = np.einsum("ij,ij->i", q_surf, normals)
+
+    # --- get each face area ---
+    areas = surf.compute_cell_sizes()["Area"]   # length n_surf_cells
+
+    # --- integrate heat flux (outward) ---
+    total_flux = np.sum(qn * areas)
+
+    return total_flux, q_surf, qn
 
 if __name__ == "__main__":
     pvd_file = "simdata_size-factor=2_discontinuous-bodies/results/case.pvd"
