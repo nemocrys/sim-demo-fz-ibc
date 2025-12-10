@@ -212,7 +212,7 @@ surf_feed.data.update({
     "Layer Relative Permeability": "Real 1",
     "Heat transfer coefficient": heat_transfer_coefficient,
     "External Temperature": 293.15,
-    "Radiation": "Idealized"
+    "Radiation": "Idealized",
     "Save Scalars": "Logical True",
 })
 
