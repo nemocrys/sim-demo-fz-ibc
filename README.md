@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/553434098.svg)](https://doi.org/10.5281/zenodo.20020184)
+
 # demo-fz-ibc
 
 Mangetic field and thermal simulation of simple Floating Zone configuration with one-turn flat inductor using the impedance-boundary condition in ElmerFEM.
