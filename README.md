@@ -1,7 +1,5 @@
 # demo-fz-ibc
 
-**Zenodo reference**
-
 Mangetic field and thermal simulation of simple Floating Zone configuration with one-turn flat inductor using the impedance-boundary condition in ElmerFEM.
 
 The project is developed and maintained by the [**Model experiments group**](https://www.ikz-berlin.de/en/research/materials-science/section-fundamental-description#c486) at the Leibniz Institute for Crystal Growth (IKZ).
